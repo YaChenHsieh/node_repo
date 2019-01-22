@@ -7,33 +7,46 @@
 <table class="table table-hover table-dark">
   <thead>
     <tr  >
-      <th><i class="far fa-trash-alt"></i></th>
+      <th scope="col"><i class="fas fa-trash-alt"></i></th>
+      <th scope="col">ajax delete</th>
       <th scope="col">#</th>
       <th scope="col">sales_id</th>
       <th scope="col">name</th>
       <th scope="col">birthday</th>
+      <th scope="col"><i class="fas fa-edit"></i></th>
     </tr>
   </thead>
   <tbody>
-      {{#each sales }}
-    <tr >
-      <td><a href="javascript:/sales3/remove/{{sid}}"><i class="far fa-trash-alt"></i></a></td>
-      <td> {{sid}}</td>
-      <td> {{sales_id}} </td>
-      <td> {{name}}</td>
-      <td> {{birth}}</td>
+      {{#each sales}}
+    <tr>
+      <td ><a href="javascript: remove_item({{sid}})"><i class="fas fa-trash-alt"></i></a></td>
+      <td><i class="fas fa-trash-alt my-del-icon" data-sid="{{sid}}" ></i></td>
+      <td >{{sid}}</td>
+      <td>{{sales_id}}</td>
+      <td>{{name}}</td>
+      <td>{{birth}}</td>
+      <td><a href="/sales3/edit/{{sid}}"><i class="fas fa-edit"></i></a></td>
     </tr>
     {{/each}}
   </tbody>
 </table>
 
 <script>
-function remove_item(sid){
-if(confirm("確定要移除"  + sid +"資料嗎?")){
+    function remove_item(sid){
+        if(confirm("確定要移除編號為 " + sid + " 的資料嗎?")){
+            location.href = '/sales3/remove/' + sid;
+        }
+    }
 
-  location.href='/sales3remove/' + sid ;
-}
-
-}
+    $('.my-del-icon').click(function(){
+        var me = $(this);
+        var sid = me.attr('data-sid');
+        if(confirm("確定要移除編號為 " + sid + " 的資料嗎?")){
+            $.get('/sales3/remove2/' + sid, function(data){
+                console.log(data);
+                me.closest('tr').remove();
+            }, 'json');
+        }
+    });
 
 </script>

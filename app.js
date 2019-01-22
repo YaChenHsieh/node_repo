@@ -97,7 +97,7 @@ app.get("/sales", (request, response) => {
   data.sales = sales;
   data.myclass = "table-danger";
 
-  res.render("sales", data);
+  response.render("sales", data);
 });
 
 /*下方新增一個跟上方sales一樣的sales2 */
@@ -124,7 +124,7 @@ app.get("/try-querystring", (request, response) => {
 app.get("/try-post-form", (request, response) => {
   response.render("try-post-form.hbs");
 });
-//Parser兩種功能: 1.url 2.json
+//Parser兩種功能(轉義解析): 1.url 2.json
 //使用url功能
 app.post("/try-post-form", (request, response) => {
   response.render("try-post-form.hbs", {
@@ -171,7 +171,7 @@ app.get(/^\/hi\/?/, (request, response) => {
 app.get(/^\/09\d{2}\-?\d{3}\-?\d{3}/, (request, response) => {
   let str = request.url.slice(1);
   str = str.split("-").join("");
-  response.send("􀂠􀃒: " + str);
+  response.send("mobile : " + str);
 });
 
 //my router//=============================================
@@ -266,7 +266,7 @@ app.get("/sales3/add", (request, response) => {
 });
 
 app.post("/sales3/add", (request, response) => {
-  const data = res.locals.renderData;
+  const data = response.locals.renderData;
   const val = {
     sales_id: request.body.sales_id,
     name: request.body.name,
@@ -321,7 +321,7 @@ app.post("/sales3/add", (request, response) => {
 });
 
 //刪除資料=========================================================2019/01/22
-app.get("/sales3/remove/:sid", (requset, response) => {
+app.get("/sales3/remove/:sid", (request, response) => {
   db.query(
     "DELETE FROM `sales` WHERE `sid`=?",
     [request.params.sid],
@@ -330,7 +330,93 @@ app.get("/sales3/remove/:sid", (requset, response) => {
     }
   );
 });
-//============================
+//========================================================
+app.get("/sales3/remove2/:sid", (request, response) => {
+  db.query(
+    "DELETE FROM `sales` WHERE `sid`=?",
+    [request.params.sid],
+    (error, results, fields) => {
+      response.json({
+        success: true,
+        affectedRows: results.affectedRows
+      });
+    }
+  );
+});
+//=======================================================
+
+//新增資料
+app.get("/sales3/edit/:sid", (request, response) => {
+  db.query(
+    "SELECT * FROM `sales` WHERE `sid`=?",
+    [request.params.sid],
+    (error, results, fields) => {
+      if (!results.length) {
+        response.status(404);
+        response.send("No data!");
+      } else {
+        results[0].birthday = moment(results[0].birthday).format("YYYY-MM-DD");
+        response.render("sales3_edit", {
+          item: results[0]
+        });
+      }
+    }
+  );
+});
+
+///=====================================post
+app.post("/sales3/edit/:sid", (request, response) => {
+  let my_result = {
+    success: false,
+    affectedRows: 0,
+    info: "每一欄皆為必填欄位"
+  };
+  const val = {
+    sales_id: request.body.sales_id,
+    name: request.body.name,
+    birthday: request.body.birthday
+  };
+
+  if (!request.body.sales_id || !request.body.name || !request.body.birthday) {
+    response.json(my_result);
+    return;
+  }
+  //=================================================================================
+  db.query(
+    "SELECT 1 FROM `sales` WHERE `sales_id`=? AND sid<>?",
+    [request.body.sales_id, request.params.sid],
+    (error, results, fields) => {
+      if (results.length) {
+        my_result["info"] = "員工編號重複";
+        response.json(my_result);
+        return;
+      }
+
+      const sql = "UPDATE `sales` SET ? WHERE sid=?";
+      db.query(sql, [val, request.params.sid], (error, results, fields) => {
+        if (error) {
+          console.log(error);
+          // res.send(error.sqlMessage);
+          // return;
+        }
+
+        if (results.affectedRows === 1) {
+          my_result = {
+            success: true,
+            affectedRows: 1,
+            info: "修改成功"
+          };
+          response.json(my_result);
+        } else {
+          my_result["info"] = "資料沒有變更";
+          responses.json(my_result);
+        }
+      });
+    }
+  );
+});
+
+///=====================================
 app.use((request, response) => {
   response.type("text/plain");
   response.status(404);
