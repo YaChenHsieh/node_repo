@@ -205,6 +205,9 @@ app.get("/login", (request, response) => {
 });
 
 app.post("/login", (request, response) => {
+  db.query(sql, val, (error, results, fields) => {
+    console.log("results");
+  });
   if (request.body.user === "shin" && request.body.password === "123") {
     request.session.loginUser = request.body.user;
     request.session.flashMsg = {
@@ -262,7 +265,7 @@ app.get("/sales3", (request, response) => {
 //============================================
 //新增User欄位
 app.get("/sales3/add", (request, response) => {
-  response.render("sales3_add");
+  response.render("sales3_add.hbs");
 });
 
 app.post("/sales3/add", (request, response) => {
@@ -288,9 +291,10 @@ app.post("/sales3/add", (request, response) => {
   }
 
   db.query(
-    "SELECT 1 FROM sales WHERE sales_id =?", //sql,
+    "SELECT 1 FROM sales WHERE sales_id =?", //sql,      //此處選擇1=>如果有一筆被選到，代表sales_id有重複
     [request.body.sales_id], //val, //[request.body.sales_id, request.body.name, request.body.birthday], //value//
     (error, results, fields) => {
+      //此處results是回傳一個陣列
       if (results.length) {
         data.msg = {
           type: "danger",
@@ -345,7 +349,7 @@ app.get("/sales3/remove2/:sid", (request, response) => {
 });
 //=======================================================
 
-//新增資料
+//修改資料
 app.get("/sales3/edit/:sid", (request, response) => {
   db.query(
     "SELECT * FROM `sales` WHERE `sid`=?",
