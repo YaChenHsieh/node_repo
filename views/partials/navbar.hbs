@@ -1,0 +1,59 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container">
+    <a class="navbar-brand" href="#">Navbar</a>
+
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+         
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Dropdown
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/home">Home</a>
+                    <a class="dropdown-item" href="/sales">Sales</a>
+                    <a class="dropdown-item" href="/sales2">Sales2</a>
+                    <a class="dropdown-item" href="/form01.html">form01</a>
+                    <a class="dropdown-item" href="/try-querystring?a=10&b=abc">try_querystring</a>
+                    <a class="dropdown-item" href="/try-post-form">try_post_form</a>
+                    <a class="dropdown-item" href="/try-upload">try-upload</a>
+                     <a class="dropdown-item" href="/try-session">try-session</a>
+                    <a class="dropdown-item" href="/admin1">admin1</a>
+                    <a class="dropdown-item" href="/admin2">admin2</a>
+                    <a class="dropdown-item" href="/admin3">admin3</a>
+                    <a class="dropdown-item" href="/login">Login</a>
+                    <div class="dropdown-divider"></div> 
+
+                    <!--<a class="dropdown-item" href="#">Something else here</a>-->
+                </div>
+            </li>
+        </ul>
+
+
+        <ul class="navbar-nav ">
+
+            {{#if loginUser}}
+            <li class="nav-item ">
+                <a class="nav-link">{{loginUser}}</a>
+            </li>
+
+             <li class="nav-item ">
+                <a class="nav-link" href="/logout">登出</a>
+            </li>
+            {{else}}
+             <li class="nav-item ">
+                <a class="nav-link" href="/login">log in</a>
+            </li>
+            {{/if}}
+
+        </ul>
+
+
+
+    </div>
+  </div>
+</nav>

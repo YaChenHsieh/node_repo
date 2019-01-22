@@ -1,0 +1,39 @@
+<div>
+
+    <a href="/sales3/add" class="btn btn-primary">Add New info</a>
+</div>
+
+
+<table class="table table-hover table-dark">
+  <thead>
+    <tr  >
+      <th><i class="far fa-trash-alt"></i></th>
+      <th scope="col">#</th>
+      <th scope="col">sales_id</th>
+      <th scope="col">name</th>
+      <th scope="col">birthday</th>
+    </tr>
+  </thead>
+  <tbody>
+      {{#each sales }}
+    <tr >
+      <td><a href="javascript:/sales3/remove/{{sid}}"><i class="far fa-trash-alt"></i></a></td>
+      <td> {{sid}}</td>
+      <td> {{sales_id}} </td>
+      <td> {{name}}</td>
+      <td> {{birth}}</td>
+    </tr>
+    {{/each}}
+  </tbody>
+</table>
+
+<script>
+function remove_item(sid){
+if(confirm("確定要移除"  + sid +"資料嗎?")){
+
+  location.href='/sales3remove/' + sid ;
+}
+
+}
+
+</script>

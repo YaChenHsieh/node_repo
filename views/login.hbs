@@ -1,0 +1,29 @@
+{{#if flashMsg}}
+<div class="alert alert-{{flashMsg.type}}">{{flashMsg.msg}}</div>
+{{/if}}
+
+
+{{#if logined}}
+<div>
+<h2> Hello {{loginUser}}</h2>
+<a href="/logout"> Logout </a>
+</div>
+
+{{else}}
+<div>
+<form  method="post">
+ 
+  <div class="form-group">
+    <label for="user">User:</label>
+    <input type="text" class="form-control" id="user" name="user" placeholder="Enter username" autocomplete="off">
+  </div>
+
+  <div class="form-group">
+    <label for="password">Password:</label>
+    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+{{/if}}

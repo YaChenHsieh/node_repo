@@ -1,0 +1,21 @@
+
+{{#if result}}
+<div>
+{{name}}
+<img  src="{{avatar}}">
+</div>
+{{/if}}
+<form  method="post" enctype="multipart/form-data">
+
+  <div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" class="form-control" id="name" name="name" >
+  </div>
+
+  <div class="form-group">
+    <label for="Photo">Photo:</label>
+    <input type="file" class="form-control" id="Photo" name="avatar">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>

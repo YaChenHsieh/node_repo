@@ -1,0 +1,26 @@
+{{#if msg}}
+<div class="alert alert-{{msg.type}}">{{msg.info}}</div>
+{{/if}}
+
+
+<div>
+<form  method="post">
+ 
+  <div class="form-group">
+    <label for="sales_id">User-id:</label>
+    <input type="text" class="form-control" id="sales_id" value="{{addForm.sales_id}}" name="sales_id"  autocomplete="off">
+  </div>
+
+  <div class="form-group">
+    <label for="name">Name:</label>
+    <input type="text" class="form-control" id="name" value="{{addForm.name}}" name="name" autocomplete="off" >
+  </div>
+
+  <div class="form-group">
+    <label for="birthday">Birthday:</label>
+    <input type="text" class="form-control" id="birthday" value="{{addForm.birthday}}" name="birthday" autocomplete="off">
+  </div>
+
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
