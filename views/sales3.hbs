@@ -1,5 +1,11 @@
-<div>
+<style>
+    .my-del-icon {
+        color: red;
+        cursor: pointer;
+    }
+</style>
 
+<div>
     <a href="/sales3/add" class="btn btn-primary">Add New info</a>
 </div>
 
@@ -20,7 +26,7 @@
       {{#each sales}}
     <tr>
       <td ><a href="javascript: remove_item({{sid}})"><i class="fas fa-trash-alt"></i></a></td>
-      <td><i class="fas fa-trash-alt my-del-icon" data-sid="{{sid}}" ></i></td>
+      <td><i class="fas fa-trash-alt   my-del-icon" data-sid="{{sid}}" ></i></td>
       <td >{{sid}}</td>
       <td>{{sales_id}}</td>
       <td>{{name}}</td>
@@ -37,12 +43,12 @@
             location.href = '/sales3/remove/' + sid;
         }
     }
-
-    $('.my-del-icon').click(function(){
+     //ajax;
+    $('.my-del-icon').click(function(){ //點了上面後，就來這邊做click function
         var me = $(this);
-        var sid = me.attr('data-sid');
-        if(confirm("確定要移除編號為 " + sid + " 的資料嗎?")){
-            $.get('/sales3/remove2/' + sid, function(data){
+        var sid02 = me.attr('data-sid');
+        if(confirm("確定要移除編號為 " + sid02 + " 的資料嗎?")){
+            $.get('/sales3/remove2/' + sid02, function(data){
                 console.log(data);
                 me.closest('tr').remove();
             }, 'json');

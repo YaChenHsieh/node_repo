@@ -36,11 +36,12 @@ app.use(
 
 //自訂middleware
 app.use((request, response, next) => {
-  response.locals.renderData = { loginUser: request.session.loginUser };
+  response.locals.renderData = { loginUser : request.session.loginUser };
   next();
 });
 
 //DB設定
+
 const mysql = require("mysql");
 const db = mysql.createConnection({
   host: "localhost",
@@ -205,23 +206,28 @@ app.get("/login", (request, response) => {
 });
 
 app.post("/login", (request, response) => {
-  db.query(sql, val, (error, results, fields) => {
-    console.log("results");
-  });
-  if (request.body.user === "shin" && request.body.password === "123") {
-    request.session.loginUser = request.body.user;
-    request.session.flashMsg = {
-      type: "success",
-      msg: "登入成功"
-    };
-    // response.send("ok");
-  } else {
-    request.session.flashMsg = {
-      type: "danger",
-      msg: "username or password 錯誤喔"
-    };
-  }
-  response.redirect("/login");
+  db.query(
+    "SELECT * FROM `admins` WHERE `admin_id`=? AND `password`=SHA1(?)",
+    [request.body.user, request.body.password],
+    (error, results, fields) => {
+      console.log("results");
+      if (!results.length) {
+        request.session.flashMsg = {
+          type: "danger",
+          msg: "username or password 錯誤喔"
+        };
+      } else {
+        request.session.loginUser = request.body.user;
+        request.session.flashMsg = {
+          type: "success",
+          msg: "登入成功"
+        };
+      }
+      response.redirect("/login");
+    }
+  );
+
+  //============================================================================debug
 });
 
 app.get("/logout", (request, response) => {
@@ -265,7 +271,7 @@ app.get("/sales3", (request, response) => {
 //============================================
 //新增User欄位
 app.get("/sales3/add", (request, response) => {
-  response.render("sales3_add.hbs");
+  response.render("sales3_add.hbs"); //起始畫面
 });
 
 app.post("/sales3/add", (request, response) => {
@@ -291,11 +297,12 @@ app.post("/sales3/add", (request, response) => {
   }
 
   db.query(
-    "SELECT 1 FROM sales WHERE sales_id =?", //sql,      //此處選擇1=>如果有一筆被選到，代表sales_id有重複
-    [request.body.sales_id], //val, //[request.body.sales_id, request.body.name, request.body.birthday], //value//
+    "SELECT * FROM sales WHERE sales_id=? AND sid <>?", //sql, //如果有一筆被選到，代表sales_id有重複 (不等於<>)
+    [request.body.sales_id, request.params.sid], //val, < 我輸入的ID    ,   我網址上面的參數 >
     (error, results, fields) => {
       //此處results是回傳一個陣列
       if (results.length) {
+        //if select 回傳得result 有回傳一個陣列，代表資料庫有這筆資料，所以會有長度//
         data.msg = {
           type: "danger",
           info: "sales_id已被使用!!"
@@ -306,6 +313,7 @@ app.post("/sales3/add", (request, response) => {
 
       const sql = "INSERT INTO `sales` SET ?";
       db.query(sql, val, (error, results, fields) => {
+        //val在上面，sql = (const sql = "INSERT INTO `sales` SET ?";)
         if (error) {
           console.log(error);
           response.send(error.sqlMessage);
@@ -313,34 +321,38 @@ app.post("/sales3/add", (request, response) => {
         }
 
         if (results.affectedRows === 1) {
+          //affectedRows新增的筆數成功
           data.msg = {
             type: "success",
             info: "資料新增成功"
           };
           response.render("sales3_add", data);
-        }
-      });
-    }
-  );
-});
+        }// if end
+      }); //dbquery
+    }//error,results
+  );//dbquery(select)
+});//app.post
 
 //刪除資料=========================================================2019/01/22
 app.get("/sales3/remove/:sid", (request, response) => {
   db.query(
     "DELETE FROM `sales` WHERE `sid`=?",
-    [request.params.sid],
+    [request.params.sid], // request上方:sid的值
     (error, results, fields) => {
-      response.redirect("/sales3");
+      response.redirect("/sales3.hbs");
     }
   );
 });
 //========================================================
+
 app.get("/sales3/remove2/:sid", (request, response) => {
+  //在刪除時，會透過SALES3.HBS裡面的SCRIPT設定，找到要刪除的值
   db.query(
     "DELETE FROM `sales` WHERE `sid`=?",
-    [request.params.sid],
+    [request.params.sid], //參數  //上方:sid的值會儲存後，帶入此處(為一個object)
     (error, results, fields) => {
       response.json({
+        //將上方的object給得值轉為json
         success: true,
         affectedRows: results.affectedRows
       });
@@ -353,15 +365,17 @@ app.get("/sales3/remove2/:sid", (request, response) => {
 app.get("/sales3/edit/:sid", (request, response) => {
   db.query(
     "SELECT * FROM `sales` WHERE `sid`=?",
-    [request.params.sid],
+    [request.params.sid], //上方:sid的值會儲存後，帶入此處(為一個object)
     (error, results, fields) => {
+      //預防別人在網址後方亂輸入sid後，即可對資料做編輯，修改數字
       if (!results.length) {
+        //沒有results的陣列(長度)時，代表他沒有資料，可能他是透過網址直接輸入
         response.status(404);
         response.send("No data!");
       } else {
-        results[0].birthday = moment(results[0].birthday).format("YYYY-MM-DD");
+        results[0].birthday = moment(results[0].birthday).format("YYYY-MM-DD"); //因為result結果回傳的是一個陣列，第一個值=result[0] // [{sid:xx ,sales:xxx, name:000}]
         response.render("sales3_edit", {
-          item: results[0]
+          item: results[0] //取得值後修改，進入sales3_edit
         });
       }
     }
@@ -371,24 +385,26 @@ app.get("/sales3/edit/:sid", (request, response) => {
 ///=====================================post
 app.post("/sales3/edit/:sid", (request, response) => {
   let my_result = {
-    success: false,
-    affectedRows: 0,
+    success: false, //預設值為false，才不會一開始就成功
+    affectedRows: 0, //因為尚未修改，所以還不會出現affectedRows，所以=0
     info: "每一欄皆為必填欄位"
   };
   const val = {
+    //取出我編輯修改後的值
     sales_id: request.body.sales_id,
     name: request.body.name,
     birthday: request.body.birthday
   };
 
   if (!request.body.sales_id || !request.body.name || !request.body.birthday) {
-    response.json(my_result);
-    return;
+    response.json(my_result); //json格式的my_result值
+    return; //格式錯誤，回傳一開始設定的my_result(success=false, affecredrow=0 ...)
   }
   //=================================================================================
+  //確認修改的直都有輸入後，去資料庫找
   db.query(
-    "SELECT 1 FROM `sales` WHERE `sales_id`=? AND sid<>?",
-    [request.body.sales_id, request.params.sid],
+    "SELECT * FROM `sales` WHERE `sales_id`= ? AND sid<> ? ", //sid<> ?  ==> sid不等於sid
+    [request.body.sales_id, request.params.sid], //(我輸入的)  欄位內修改的值  ==> 會要求回傳到上方?(問號)做比對
     (error, results, fields) => {
       if (results.length) {
         my_result["info"] = "員工編號重複";
@@ -398,6 +414,7 @@ app.post("/sales3/edit/:sid", (request, response) => {
 
       const sql = "UPDATE `sales` SET ? WHERE sid=?";
       db.query(sql, [val, request.params.sid], (error, results, fields) => {
+        //val 就是上方post後定義的那3個
         if (error) {
           console.log(error);
           // res.send(error.sqlMessage);
@@ -419,8 +436,16 @@ app.post("/sales3/edit/:sid", (request, response) => {
     }
   );
 });
-
 ///=====================================
+//建立需登入後才可以看到內文的APP
+// app.get("/sales4/login", (req, res) => {
+//   res.send("hello /sales4/login");
+// });
+
+app.use("/sales4", require("./my_router/sales4.js"));
+
+//===========================================
+
 app.use((request, response) => {
   response.type("text/plain");
   response.status(404);
