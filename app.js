@@ -29,7 +29,7 @@ app.use(
   session({
     saveUninitialized: false,
     resave: false,
-    secret: "jhcdhdhuch",
+    secret: "secret",
     cookie: { maxAge: 60000 }
   })
 );
@@ -53,10 +53,10 @@ db.connect();
 //=====================================================
 
 app.engine(
-  "hbs",
-  exphbs({
+  "hbs", //引擎名稱
+  exphbs({ //設定使用引擎的樣板，和佈局檔
     defaultLayout: "main",
-    extname: "hbs",
+    extname: "hbs", //副檔名稱
     helpers: { list: require("./helpers/list.js") }
   }) //上方list是可自訂的名稱，連動list.js 與 sales2.hbs 的list //
 );
@@ -107,6 +107,11 @@ app.get("/sales2", (request, response) => {
   response.render("sales2", {
     sales: sales
   });
+});
+//===================================foodfoodfood
+app.get("/food",(req,res)=>{
+const food= require("./data/food.json");
+res.render("food", {food : food});
 });
 
 app.post("/form01.html", (request, response) => {
@@ -452,6 +457,6 @@ app.use((request, response) => {
   response.send("Page not found.....");
 });
 
-app.listen(3005, () => {
+app.listen(3003, () => {
   console.log("server start...");
 });
